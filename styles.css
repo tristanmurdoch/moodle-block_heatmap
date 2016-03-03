@@ -1,4 +1,29 @@
-.view_count {
+.block_heatmap_view_count {
     padding-left: 30px !important;
     font-size: x-small;
+}
+
+.block_heatmap_sincecoursestart,
+.block_heatmap_updated {
+    font-size: x-small;
+}
+
+.block_heatmap_heat_0 {
+    background-color: #F5ECCE;
+}
+
+.block_heatmap_heat_1 {
+    background-color: #F5D0A9;
+}
+
+.block_heatmap_heat_2 {
+    background-color: #F5BCA9;
+}
+
+.block_heatmap_heat_3 {
+    background-color: #F5A9A9;
+}
+
+.block_heatmap_heat_4 {
+    background-color: #F78181;
 }

@@ -59,26 +59,8 @@ class block_heatmap extends block_base {
      *
      * @return bool
      */
-    public function instance_allow_config() {
-        return false;
-    }
-
-    /**
-     * Controls global configurability of block.
-     *
-     * @return bool
-     */
     public function has_config() {
-        return false;
-    }
-
-    /**
-     * Controls if a block header is shown based on instance configuration.
-     *
-     * @return bool
-     */
-    public function hide_header() {
-        return false;
+        return true;
     }
 
     /**
@@ -114,18 +96,29 @@ class block_heatmap extends block_base {
             return $this->content;
         }
 
+        // Get global settings.
+        $cachelife = get_config('block_heatmap', 'cachelife');
+        if ($cachelife === false) {
+            $cachelife = (5 * 60);
+        }
+        $activitysince = get_config('block_heatmap', 'activitysince');
+        if ($activitysince === false) {
+            $activitysince = 'sincestart';
+        }
+
         // Get cached logs to avoid hitting the logs each reload.
         $cachedlogs = cache::make('block_heatmap', 'cachedlogs');
         $views = $cachedlogs->get('views'.$COURSE->id);
         $lastcached = $cachedlogs->get('time'.$COURSE->id);
+        $updated = $lastcached;
         $now = time();
 
-        // Check cached values are available and from last 5min.
-        if (empty($views) || !isset($lastcached) || $lastcached < $now - 300) {
+        // Check cached values are available and within set time window.
+        if (empty($views) || !isset($lastcached) || $lastcached < $now - $cachelife) {
 
-            $uselegacyreader = false; // Flag to determine if we should use the legacy reader.
+            $updated = $now;
             $useinternalreader = false; // Flag to determine if we should use the internal reader.
-            $minloginternalreader = 0; // Set this to 0 for now.
+            $uselegacyreader = false; // Flag to determine if we should use the legacy reader.
 
             // Get list of readers.
             $logmanager = get_log_manager();
@@ -134,17 +127,18 @@ class block_heatmap extends block_base {
             // Get preferred reader.
             if (!empty($readers)) {
                 foreach ($readers as $readerpluginname => $reader) {
-                    // If legacy reader is preferred reader.
-                    if ($readerpluginname == 'logstore_legacy') {
-                        $uselegacyreader = true;
-                    }
 
                     // If sql_internal_table_reader is preferred reader.
                     if ($reader instanceof \core\log\sql_internal_table_reader) {
                         $useinternalreader = true;
                         $logtable = $reader->get_internal_log_table_name();
-                        $minloginternalreader = $DB->get_field_sql('SELECT min(timecreated) FROM {' . $logtable . '}');
                     }
+
+                    // If legacy reader is preferred reader.
+                    if ($readerpluginname == 'logstore_legacy') {
+                        $uselegacyreader = true;
+                    }
+
                 }
             }
 
@@ -154,29 +148,24 @@ class block_heatmap extends block_base {
                 return $this->content;
             }
 
-            // We want to display the time we are beginning to get logs from in the heading.
-            // If we are using the legacy reader check the minimum time in that log table.
-            if ($uselegacyreader) {
-                $minlog = $DB->get_field_sql('SELECT min(time) FROM {log}');
-            }
-
-            // If we are using the internal reader check the minimum time in that table.
+            // Get record from sql_internal_table_reader.
             if ($useinternalreader) {
-                // If new log table has older data then don't use the minimum time obtained from the legacy table.
-                if (empty($minlog) || ($minloginternalreader <= $minlog)) {
-                    $minlog = $minloginternalreader;
-                }
-            }
+                $timesince = $activitysince == 'sincestart' ? 'AND timecreated >= :coursestart' : '';
+                $sql = "SELECT contextinstanceid as cmid, COUNT('x') AS numviews, COUNT(DISTINCT userid) AS distinctusers
+                          FROM {" . $logtable . "} l
+                         WHERE courseid = :courseid
+                           $timesince
+                           AND anonymous = 0
+                           AND crud = 'r'
+                           AND contextlevel = :contextmodule
+                      GROUP BY contextinstanceid";
+                $params = array('courseid' => $COURSE->id, 'contextmodule' => CONTEXT_MODULE, 'coursestart' => $COURSE->startdate);
+                $views = $DB->get_records_sql($sql, $params);
 
-            // If using legacy log then get activity usage from old table.
-            if ($uselegacyreader) {
-                // If we are going to use the internal (not legacy) log table, we should only get records
-                // from the legacy table that exist before we started adding logs to the new table.
-                $limittime = '';
-                if (!empty($minloginternalreader)) {
-                    $limittime = ' AND time < :timeto ';
-                }
+            } else if ($uselegacyreader) {
+                // If using legacy log then get activity usage from old table.
                 $logactionlike = $DB->sql_like('l.action', ':action');
+                $timesince = $activitysince == 'sincestart' ? 'AND l.time >= :coursestart' : '';
                 $sql = "SELECT cm.id, COUNT('x') AS numviews, COUNT(DISTINCT userid) AS distinctusers
                           FROM {course_modules} cm
                           JOIN {modules} m
@@ -184,42 +173,18 @@ class block_heatmap extends block_base {
                           JOIN {log} l
                             ON l.cmid = cm.id
                          WHERE cm.course = :courseid
+                           $timesince
                            AND $logactionlike
-                           AND m.visible = :visible $limittime
+                           AND m.visible = 1
                       GROUP BY cm.id";
-                $params = array('courseid' => $COURSE->id, 'action' => 'view%', 'visible' => 1);
+                $params = array('courseid' => $COURSE->id, 'action' => 'view%', 'coursestart' => $COURSE->startdate);
                 if (!empty($minloginternalreader)) {
                     $params['timeto'] = $minloginternalreader;
                 }
                 $views = $DB->get_records_sql($sql, $params);
             }
 
-            // Get record from sql_internal_table_reader and merge with records obtained from legacy log (if needed).
-            if ($useinternalreader) {
-                $sql = "SELECT contextinstanceid as cmid, COUNT('x') AS numviews, COUNT(DISTINCT userid) AS distinctusers
-                          FROM {" . $logtable . "} l
-                         WHERE courseid = :courseid
-                           AND anonymous = 0
-                           AND crud = 'r'
-                           AND contextlevel = :contextmodule
-                      GROUP BY contextinstanceid";
-                $params = array('courseid' => $COURSE->id, 'contextmodule' => CONTEXT_MODULE);
-                $v = $DB->get_records_sql($sql, $params);
-                if (empty($views)) {
-                    $views = $v;
-                } else {
-                    // Merge two view arrays.
-                    foreach ($v as $key => $value) {
-                        if (isset($views[$key]) && !empty($views[$key]->numviews)) {
-                            $views[$key]->numviews += $value->numviews;
-                        } else {
-                            $views[$key] = $value;
-                        }
-                    }
-                }
-            }
-
-            // Cache queried values for next 5min.
+            // Cache queried values for next time window.
             $cachedlogs->set('views'.$COURSE->id, $views);
             $cachedlogs->set('time'.$COURSE->id, $now);
         }
@@ -242,8 +207,28 @@ class block_heatmap extends block_base {
                 $totalusers += $activity->distinctusers;
             }
             array_unshift($views, $firstactivity);
-            $this->content->text .= get_string('totalviews', 'block_heatmap', $totalviews).'<br />';
-            $this->content->text .= get_string('distinctuserviews', 'block_heatmap', $totalusers).'<br />';
+
+            // Block text output.
+            $this->content->text .= html_writer::div(
+                get_string('totalviews', 'block_heatmap', $totalviews),
+                'block_heatmap_totalviews'
+            );
+            $this->content->text .= html_writer::div(
+                get_string('distinctuserviews', 'block_heatmap', $totalusers),
+                'block_heatmap_userviews'
+            );
+            if ($activitysince == 'sincestart') {
+                $this->content->text .= html_writer::div(
+                    get_string('sincecoursestart', 'block_heatmap'),
+                    'block_heatmap_sincecoursestart'
+                );
+            }
+            $this->content->text .= html_writer::div(
+                get_string('updated', 'block_heatmap',
+                    userdate($updated, get_string('strftimerecentfull', 'langconfig'))
+                ),
+                'block_heatmap_updated'
+            );
             $this->content->text .= html_writer::link(
                 '#null',
                 get_string('toggleheatmap', 'block_heatmap'),

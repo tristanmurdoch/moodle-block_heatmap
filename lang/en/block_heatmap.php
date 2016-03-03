@@ -24,13 +24,28 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['cache0min'] = 'Disable caching';
+$string['cache1min'] = '1 minute';
+$string['cache5min'] = '5 minutes';
+$string['cache10min'] = '10 minutes';
+$string['cache30min'] = '30 minutes';
+$string['cache60min'] = '1 hour';
+$string['cache120min'] = '2 hours';
+$string['cachelife'] = 'Cache lifespan';
+$string['cachelife_help'] = 'A cache is used to retain results and reduce impact on the log table.';
+$string['checkforactivity'] = 'Check for activity';
+$string['checkforactivity_help'] = 'How far back in logs should be checked?';
 $string['distinctusers'] = 'Distinct users';
-$string['distinctuserviews'] = 'Distinct user views: {$a}';
+$string['distinctuserviews'] = '<em>Distinct user views:</em> {$a}';
 $string['heatmap:myaddinstance'] = 'Add a Heatmap block to the Dashboard';
 $string['heatmap:addinstance'] = 'Add a Heatmap block to a course';
 $string['heatmap:view'] = 'View the Heatmap';
 $string['nologreaderenabled'] = 'No usable log reader is enabled.';
 $string['pluginname'] = 'Heatmap';
+$string['sincecoursestart'] = '(Since course start date)';
+$string['sinceforever'] = 'All past logs';
+$string['sincestart'] = 'Since course start date';
 $string['toggleheatmap'] = 'Toggle heatmap';
-$string['totalviews'] = 'Total views: {$a}';
+$string['totalviews'] = '<em>Total views:</em> {$a}';
+$string['updated'] = 'Updated: {$a}';
 $string['views'] = 'Views';
