@@ -108,6 +108,10 @@ class block_heatmap extends block_base {
         if ($activitysince === false) {
             $activitysince = 'sincestart';
         }
+        $whattoshow = get_config('block_heatmap', 'whattoshow');
+        if ($whattoshow === false) {
+            $whattoshow = 'showboth';
+        }
 
         // Get cached logs to avoid hitting the logs each reload.
         $cachedlogs = cache::make('block_heatmap', 'cachedlogs');
@@ -153,7 +157,7 @@ class block_heatmap extends block_base {
 
             // Get record from sql_internal_table_reader.
             if ($useinternalreader) {
-                $timesince = $activitysince == 'sincestart' ? 'AND timecreated >= :coursestart' : '';
+                $timesince = ($activitysince == 'sincestart') ? 'AND timecreated >= :coursestart' : '';
                 $sql = "SELECT contextinstanceid as cmid, COUNT('x') AS numviews, COUNT(DISTINCT userid) AS distinctusers
                           FROM {" . $logtable . "} l
                          WHERE courseid = :courseid
@@ -168,7 +172,7 @@ class block_heatmap extends block_base {
             } else if ($uselegacyreader) {
                 // If using legacy log then get activity usage from old table.
                 $logactionlike = $DB->sql_like('l.action', ':action');
-                $timesince = $activitysince == 'sincestart' ? 'AND l.time >= :coursestart' : '';
+                $timesince = ($activitysince == 'sincestart') ? 'AND l.time >= :coursestart' : '';
                 $sql = "SELECT cm.id, COUNT('x') AS numviews, COUNT(DISTINCT userid) AS distinctusers
                           FROM {course_modules} cm
                           JOIN {modules} m
@@ -249,10 +253,6 @@ class block_heatmap extends block_base {
         $toggledon = get_user_preferences('heatmaptogglestate', true);
         $viewsicon = $OUTPUT->pix_icon('t/hide', get_string('views', 'block_heatmap', $totalusers));
         $usersicon = $OUTPUT->pix_icon('t/user', get_string('distinctusers', 'block_heatmap', $totalusers));
-        $whattoshow = get_config('block_heatmap', 'whattoshow');
-        if ($whattoshow === false) {
-            $whattoshow = 'showboth';
-        }
         $arguments = array(
             json_encode($views),
             $minviews,
