@@ -5,13 +5,18 @@ M.block_heatmap = {
     diff: 0,
     numColours: 5,
     toggleState: true,
+    viewsicon: '',
+    usersicon: '',
 
-    initHeatmap: function (YUIObject, config, min, max, toggledon) {
+    initHeatmap: function (YUIObject, config, min, max, toggledon, viewsicon, usersicon, whattoshow) {
         this.config = JSON.parse(config);
         this.min = min;
         this.max = max;
         this.diff = max - min;
         this.toggleState = toggledon == 1;
+        this.viewsicon = viewsicon;
+        this.usersicon = usersicon;
+        this.whattoshow = whattoshow;
         if (this.toggleState) {
             this.showHeatmap();
         }
@@ -25,17 +30,21 @@ M.block_heatmap = {
             module = document.getElementById('module-' + this.config[i].cmid);
             weight = parseInt(this.config[i].numviews / this.diff * this.numColours - 1);
             if (module) {
-                module.className += ' block_heatmap_heat_' + weight;
-                info = '<div class="block_heatmap_view_count">';
-                info += M.str.block_heatmap.views;
-                info += '&nbsp;';
-                info += this.config[i].numviews;
-                info += ', &nbsp;';
-                info += M.str.block_heatmap.distinctusers;
-                info += '&nbsp;';
-                info += this.config[i].distinctusers;
-                info += '</div>';
-                module.innerHTML = module.innerHTML + info;
+                if (this.whattoshow != 'showicons') {
+                    module.className += ' block_heatmap_heat_' + weight;
+                }
+                if (this.whattoshow != 'showbackground') {
+                    info = '<div class="block_heatmap_view_count">';
+                    info += this.viewsicon;
+                    info += '&nbsp;<span class="block_heatmap_views block_heatmap_icon_' + weight + '">';
+                    info += this.config[i].numviews;
+                    info += '</span> &nbsp;';
+                    info += this.usersicon;
+                    info += '&nbsp;<span class="block_heatmap_users block_heatmap_icon_' + weight + '"">';
+                    info += this.config[i].distinctusers;
+                    info += '</span></div>';
+                    module.innerHTML = module.innerHTML + info;
+                }
             }
         }
     },

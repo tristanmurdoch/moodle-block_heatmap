@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
 
+    // Cache lifespan.
     $options = array(
         0 => get_string('cache0min', 'block_heatmap'),
         (1 * 60) => get_string('cache1min', 'block_heatmap'),
@@ -41,6 +42,7 @@ if ($ADMIN->fulltree) {
         $options)
     );
 
+    // Starting time of log queries.
     $options = array(
         'sincestart' => get_string('sincestart', 'block_heatmap'),
         'sinceforever' => get_string('sinceforever', 'block_heatmap'),
@@ -51,4 +53,18 @@ if ($ADMIN->fulltree) {
         'sincestart',
         $options)
     );
+
+    // Control background display and icons.
+    $options = array(
+        'showboth' => get_string('showboth', 'block_heatmap'),
+        'showbackground' => get_string('showbackground', 'block_heatmap'),
+        'showicons' => get_string('showicons', 'block_heatmap'),
+    );
+    $settings->add(new admin_setting_configselect('block_heatmap/whattoshow',
+        get_string('whattoshow', 'block_heatmap'),
+        '',
+        'showboth',
+        $options)
+    );
+
 }

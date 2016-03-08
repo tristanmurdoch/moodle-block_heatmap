@@ -51,6 +51,9 @@ class block_heatmap extends block_base {
     public function applicable_formats() {
         return array(
             'course-view' => true,
+            'site'        => true,
+            'mod'         => false,
+            'my'          => false,
         );
     }
 
@@ -79,7 +82,7 @@ class block_heatmap extends block_base {
      */
     public function get_content() {
 
-        global $COURSE, $DB;
+        global $COURSE, $DB, $OUTPUT;
 
         if (isset($this->content)) {
             return $this->content;
@@ -241,18 +244,23 @@ class block_heatmap extends block_base {
             'name'     => 'block_heatmap',
             'fullpath' => '/blocks/heatmap/module.js',
             'requires' => array(),
-            'strings'  => array(
-                array('views', 'block_heatmap'),
-                array('distinctusers', 'block_heatmap'),
-            ),
         );
         user_preference_allow_ajax_update('heatmaptogglestate', PARAM_BOOL);
         $toggledon = get_user_preferences('heatmaptogglestate', true);
+        $viewsicon = $OUTPUT->pix_icon('t/hide', get_string('views', 'block_heatmap', $totalusers));
+        $usersicon = $OUTPUT->pix_icon('t/user', get_string('distinctusers', 'block_heatmap', $totalusers));
+        $whattoshow = get_config('block_heatmap', 'whattoshow');
+        if ($whattoshow === false) {
+            $whattoshow = 'showboth';
+        }
         $arguments = array(
             json_encode($views),
             $minviews,
             $maxviews,
             $toggledon,
+            $viewsicon,
+            $usersicon,
+            $whattoshow,
         );
         $this->page->requires->js_init_call('M.block_heatmap.initHeatmap', $arguments, false, $jsmodule);
 
