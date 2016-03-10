@@ -120,6 +120,12 @@ class block_heatmap extends block_base {
         $updated = $lastcached;
         $now = time();
 
+        // Check that the course has started.
+        if ($whattoshow == 'sincestart' && $now < $COURSE->startdate) {
+            $this->content->text = get_string('notstarted', 'block_heatmap');
+            return $this->content;
+        }
+
         // Check cached values are available and within set time window.
         if (empty($views) || !isset($lastcached) || $lastcached < $now - $cachelife) {
 
@@ -196,52 +202,56 @@ class block_heatmap extends block_base {
             $cachedlogs->set('time'.$COURSE->id, $now);
         }
 
-        // Get the min, max and totals.
-        if (!empty($views)) {
-            $firstactivity = array_shift($views);
-            $totalviews = $firstactivity->numviews;
-            $totalusers = $firstactivity->distinctusers;
-            $minviews = $firstactivity->numviews;
-            $maxviews = $firstactivity->numviews;
-            foreach ($views as $key => $activity) {
-                $totalviews += $activity->numviews;
-                if ($activity->numviews < $minviews) {
-                    $minviews = $activity->numviews;
-                }
-                if ($activity->numviews > $maxviews) {
-                    $maxviews = $activity->numviews;
-                }
-                $totalusers += $activity->distinctusers;
-            }
-            array_unshift($views, $firstactivity);
+        // Check that there were some results.
+        if (empty($views)) {
+            $this->content->text = get_string('nologentries', 'block_heatmap');
+            return $this->content;
+        }
 
-            // Block text output.
-            $this->content->text .= html_writer::div(
-                get_string('totalviews', 'block_heatmap', $totalviews),
-                'block_heatmap_totalviews'
-            );
-            $this->content->text .= html_writer::div(
-                get_string('distinctuserviews', 'block_heatmap', $totalusers),
-                'block_heatmap_userviews'
-            );
-            if ($activitysince == 'sincestart') {
-                $this->content->text .= html_writer::div(
-                    get_string('sincecoursestart', 'block_heatmap'),
-                    'block_heatmap_sincecoursestart'
-                );
+        // Get the min, max and totals.
+        $firstactivity = array_shift($views);
+        $totalviews = $firstactivity->numviews;
+        $totalusers = $firstactivity->distinctusers;
+        $minviews = $firstactivity->numviews;
+        $maxviews = $firstactivity->numviews;
+        foreach ($views as $key => $activity) {
+            $totalviews += $activity->numviews;
+            if ($activity->numviews < $minviews) {
+                $minviews = $activity->numviews;
             }
+            if ($activity->numviews > $maxviews) {
+                $maxviews = $activity->numviews;
+            }
+            $totalusers += $activity->distinctusers;
+        }
+        array_unshift($views, $firstactivity);
+
+        // Block text output.
+        $this->content->text .= html_writer::div(
+            get_string('totalviews', 'block_heatmap', $totalviews),
+            'block_heatmap_totalviews'
+        );
+        $this->content->text .= html_writer::div(
+            get_string('distinctuserviews', 'block_heatmap', $totalusers),
+            'block_heatmap_userviews'
+        );
+        if ($activitysince == 'sincestart') {
             $this->content->text .= html_writer::div(
-                get_string('updated', 'block_heatmap',
-                    userdate($updated, get_string('strftimerecentfull', 'langconfig'))
-                ),
-                'block_heatmap_updated'
-            );
-            $this->content->text .= html_writer::link(
-                '#null',
-                get_string('toggleheatmap', 'block_heatmap'),
-                array('onclick' => 'M.block_heatmap.toggleHeatmap();')
+                get_string('sincecoursestart', 'block_heatmap'),
+                'block_heatmap_sincecoursestart'
             );
         }
+        $this->content->text .= html_writer::div(
+            get_string('updated', 'block_heatmap',
+                userdate($updated, get_string('strftimerecentfull', 'langconfig'))
+            ),
+            'block_heatmap_updated'
+        );
+        $this->content->text .= html_writer::link(
+            '#null',
+            get_string('toggleheatmap', 'block_heatmap'),
+            array('onclick' => 'M.block_heatmap.toggleHeatmap();')
+        );
 
         // Set up JS for injecting heatmap.
         $jsmodule = array(
