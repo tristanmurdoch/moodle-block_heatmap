@@ -18,8 +18,7 @@
 /**
  * Simple clock block language strings
  *
- * @package    contrib
- * @subpackage block_heatmap
+ * @package    block_heatmap
  * @copyright  2016 Michael de Raadt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,6 +30,7 @@ $string['cache10min'] = '10 minutes';
 $string['cache30min'] = '30 minutes';
 $string['cache60min'] = '1 hour';
 $string['cache120min'] = '2 hours';
+$string['cachedef_cachedlogs'] = 'Log query cache for course activity';
 $string['cachelife'] = 'Cache lifespan';
 $string['cachelife_help'] = 'A cache is used to retain results and reduce impact on the log table. Changes may not appear immediately unless you purge caches.';
 $string['checkforactivity'] = 'Check for activity';

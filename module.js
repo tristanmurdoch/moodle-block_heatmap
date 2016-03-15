@@ -50,6 +50,7 @@ M.block_heatmap = {
     },
 
     hideHeatmap: function () {
+        var module;
         for (var i = 0; i < this.config.length; i++) {
             module = document.getElementById('module-' + this.config[i].cmid);
             if (module) {

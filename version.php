@@ -18,13 +18,12 @@
 /**
  * Simple clock block version identification
  *
- * @package    contrib
- * @subpackage block_heatmap
+ * @package    block_heatmap
  * @copyright  2016 Michael de Raadt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version   = 2016031100;
+$plugin->version   = 2016031500;
 $plugin->requires  = 2014051200; // Moodle 2.7.
 $plugin->maturity  = MATURITY_BETA;
 $plugin->release   = 'Version for Moodle 2.7 onwards';

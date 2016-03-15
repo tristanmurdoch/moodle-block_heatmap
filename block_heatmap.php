@@ -18,8 +18,7 @@
 /**
  * Heatmap block definition
  *
- * @package    contrib
- * @subpackage block_heatmap
+ * @package    block_heatmap
  * @copyright  2016 Michael de Raadt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
