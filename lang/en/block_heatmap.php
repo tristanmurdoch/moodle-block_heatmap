@@ -39,7 +39,6 @@ $string['checkforactivity'] = 'Check for activity';
 $string['checkforactivity_help'] = 'How far back in logs should be checked? Changes may not appear immediately unless you purge caches.';
 $string['distinctusers'] = 'Distinct users';
 $string['distinctuserviews'] = '<em>Distinct user views:</em> {$a}';
-$string['heatmap:myaddinstance'] = 'Add a Heatmap block to the Dashboard';
 $string['heatmap:addinstance'] = 'Add a Heatmap block to a course';
 $string['heatmap:view'] = 'View the Heatmap';
 $string['nologreaderenabled'] = 'No usable log reader is enabled.';
