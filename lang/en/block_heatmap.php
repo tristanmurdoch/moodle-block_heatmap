@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 $string['cache0min'] = 'Disable caching';
 $string['cache1min'] = '1 minute';
 $string['cache5min'] = '5 minutes';
