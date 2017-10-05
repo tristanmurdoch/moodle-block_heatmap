@@ -29,7 +29,7 @@ class export_data extends \core\task\scheduled_task {
 
 	  // get data using courses data
 
-    $data = array();
+    //$data = array();
     
     foreach($courses as $course){
         if(isset($course->id)){
@@ -46,20 +46,18 @@ class export_data extends \core\task\scheduled_task {
 	          $params = array('courseid' => $course->id, 'contextmodule' => CONTEXT_MODULE, 'coursestart' => $course->startdate );
             //print_r($sql);
             $views = $DB->get_records_sql($sql, $params);
-            $myArray[] = $views;
+            //var_dump($views);
+            $records[] = $views;
 	      }
     }
   // flag data that needs deleted
 
-    $sql_update = 'UPDATE mdl_block_heatmap SET status = 1';
+    $sql_update = 'UPDATE {block_heatmap} SET status = 1';
     $DB->execute($sql_update, $parms=null);
 
-    var_dump($myArray);
-
-    foreach ($myArray as $key) {
-        foreach ($key as $k){
-        var_dump($k);
-        $lastinsertid = $DB->insert_record('block_heatmap', $k, false);
+    foreach ($records as $record) {
+        foreach ($record as $rec){
+        $lastinsertid = $DB->insert_record('block_heatmap', $rec, false);
         }
     }
 
