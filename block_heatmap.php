@@ -111,6 +111,22 @@ class block_heatmap extends block_base {
         if ($whattoshow === false) {
             $whattoshow = 'showboth';
         }
+	
+	$displayblockviews = get_config('block_heatmap', 'displayblockviews');
+        if ($displayblockviews !== 'true') {
+		$displayblockviews = false;
+        
+	}
+        $displaydistinctuserviews = get_config('block_heatmap', 'displaydistinctuserviews');
+        if ($displaydistinctuserviews !== 'true') {
+                $displaydistinctuserviews = false;
+
+        }
+        $displaydistinctusers = get_config('block_heatmap', 'displaydistinctusers');
+        if ($displaydistinctusers !== 'true') {
+                $displaydistinctusers = false;
+
+        }
 
         // Get cached logs to avoid hitting the logs each reload.
         $cachedlogs = cache::make('block_heatmap', 'cachedlogs');
@@ -261,19 +277,24 @@ class block_heatmap extends block_base {
               $params = array('courseid' => $COURSE->id);
                 //print_r($params);
                 $totalusersdistinct = $DB->get_record_sql($sql, $params);
-
+            if ($displayblockviews){
             $this->content->text .= html_writer::div(
                 get_string('totalviews', 'block_heatmap', $totalviews->numofactviews),
                 'block_heatmap_totalviews'
             );
+            }
+            if ($displaydistinctuserviews){
             $this->content->text .= html_writer::div(
                 get_string('distinctuserviews', 'block_heatmap', $totalusers),
                 'block_heatmap_userviews'
             );
+            }
+            if ($displaydistinctusers){
             $this->content->text .= html_writer::div(
                 get_string('totaldistinctusers', 'block_heatmap', $totalusersdistinct->users),
                 'block_heatmap_userviews'
             );    
+            }
             if ($activitysince == 'sincestart') {
                 $this->content->text .= html_writer::div(
                     get_string('sincecoursestart', 'block_heatmap', date("d/m/y",$COURSE->startdate)),
@@ -286,14 +307,18 @@ class block_heatmap extends block_base {
                 'block_heatmap_updated'
             );
         } else {
+	    if ($displayblockviews){
             $this->content->text .= html_writer::div(
                 get_string('totalviews', 'block_heatmap', $totalviews),
                 'block_heatmap_totalviews'
             );
+            }
+            if ($displaydistinctuserviews){
             $this->content->text .= html_writer::div(
                 get_string('distinctuserviews', 'block_heatmap', $totalusers),
                 'block_heatmap_userviews'
             );
+            }
             if ($activitysince == 'sincestart') {
                 $this->content->text .= html_writer::div(
                     get_string('sincecoursestart', 'block_heatmap', date("d/m/y",$COURSE->startdate)),

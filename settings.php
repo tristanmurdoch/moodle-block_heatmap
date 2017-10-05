@@ -78,5 +78,37 @@ if ($ADMIN->fulltree) {
         'showboth',
         $options)
     );
-
+    // On/Off display of total views in block.
+    $options = array(
+        'true' => get_string('student_reporting_enabled', 'block_heatmap'), 
+        'false' => get_string('student_reporting_disabled', 'block_heatmap')
+    );
+    $settings->add(new admin_setting_configselect('block_heatmap/displayblockviews',
+    get_string('displayblockviews', 'block_heatmap'),
+    get_string('displayblockviews_help', 'block_heatmap'),
+    'true',
+    $options)
+    );
+     // On/Off display of distinct users in block.
+    $options = array(
+        'true' => get_string('student_reporting_enabled', 'block_heatmap'),
+        'false' => get_string('student_reporting_disabled', 'block_heatmap')
+    );
+    $settings->add(new admin_setting_configselect('block_heatmap/displaydistinctusers',
+    get_string('displaydistinctuserviews', 'block_heatmap'),
+    get_string('displaydistinctuserviews_help', 'block_heatmap'),
+    'true',
+    $options)
+    );
+    // On/Off display of distinct user views in block.
+    $options = array(
+        'true' => get_string('student_reporting_enabled', 'block_heatmap'),
+        'false' => get_string('student_reporting_disabled', 'block_heatmap')
+    );
+    $settings->add(new admin_setting_configselect('block_heatmap/displaydistinctuserviews',
+    get_string('displaydistinctusers', 'block_heatmap'),
+    get_string('displaydistinctusers_help', 'block_heatmap'),
+    'true',
+    $options)
+    );
 }
