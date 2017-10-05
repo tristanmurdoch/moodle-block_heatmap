@@ -239,7 +239,7 @@ class block_heatmap extends block_base {
       $this->content->text .= html_writer::link(
             null,
             get_string('toggleheatmap', 'block_heatmap'),
-            array('onclick' => 'M.block_heatmap.toggleHeatmap();', 'style' => 'float:right', 'class' => 'btn btn-info')
+            array('onclick' => 'M.block_heatmap.toggleHeatmap();', 'style' => 'cursor: pointer; margin-bottom: 10px; margin-top: 2px;', 'class' => 'btn btn-info')
         );
 
       if ($usecachetable) {
