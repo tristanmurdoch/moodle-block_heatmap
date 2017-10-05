@@ -2,7 +2,7 @@
 function xmldb_block_heatmap_upgrade($oldversion) {
     global $CFG, $DB;
     $dbman = $DB->get_manager();
-    if ($oldversion < 2016120706) {
+    if ($oldversion < 2017100500) {
         // Define table heatmap to be created.
         $table = new xmldb_table('block_heatmap');
         // Adding fields to table heatmap.
@@ -21,7 +21,7 @@ function xmldb_block_heatmap_upgrade($oldversion) {
             $dbman->create_table($table);
         }
         // heatmap savepoint reached.
-        upgrade_block_savepoint(true, 2016120706, 'heatmap');
+        upgrade_block_savepoint(true, 2017100500, 'heatmap');
 }
 return true;
 }
