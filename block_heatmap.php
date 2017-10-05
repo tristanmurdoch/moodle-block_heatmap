@@ -160,8 +160,19 @@ class block_heatmap extends block_base {
                 return $this->content;
             }
 
+            $usecachetable = get_config('block_heatmap', 'temptable');
+            if ($usecachetable !== 'true') {
+                $usecachetable = false;
+            }
+            
+            // Get records from cached table if true
+            if ($usecachetable) {
+                $sql = "SELECT cmid, numviews, distinctusers, courseid FROM mdl_block_heatmap where courseid = :courseid";
+                $params = array('courseid' => $COURSE->id, 'contextmodule' => CONTEXT_MODULE, 'coursestart' => $COURSE->startdate);
+                $views = $DB->get_records_sql($sql, $params);
+             
             // Get record from sql_internal_table_reader.
-            if ($useinternalreader) {
+             }elseif ($useinternalreader) {
                 $timesince = ($activitysince == 'sincestart') ? 'AND timecreated >= :coursestart' : '';
                 $sql = "SELECT contextinstanceid as cmid, COUNT('x') AS numviews, COUNT(DISTINCT userid) AS distinctusers
                           FROM {" . $logtable . "} l
@@ -225,33 +236,77 @@ class block_heatmap extends block_base {
         }
         array_unshift($views, $firstactivity);
 
-        // Block text output.
-        $this->content->text .= html_writer::div(
-            get_string('totalviews', 'block_heatmap', $totalviews),
-            'block_heatmap_totalviews'
-        );
-        $this->content->text .= html_writer::div(
-            get_string('distinctuserviews', 'block_heatmap', $totalusers),
-            'block_heatmap_userviews'
-        );
-        if ($activitysince == 'sincestart') {
-            $this->content->text .= html_writer::div(
-                get_string('sincecoursestart', 'block_heatmap'),
-                'block_heatmap_sincecoursestart'
-            );
-        }
-        $this->content->text .= html_writer::div(
-            get_string('updated', 'block_heatmap',
-                userdate($updated, get_string('strftimerecentfull', 'langconfig'))
-            ),
-            'block_heatmap_updated'
-        );
-        $this->content->text .= html_writer::link(
+      $this->content->text .= html_writer::link(
             null,
             get_string('toggleheatmap', 'block_heatmap'),
-            array('onclick' => 'M.block_heatmap.toggleHeatmap();', 'style' => 'cursor: pointer;')
+            array('onclick' => 'M.block_heatmap.toggleHeatmap();', 'style' => 'float:right', 'class' => 'btn btn-info')
         );
 
+      if ($usecachetable) {
+            $tasks = \core\task\manager::get_all_scheduled_tasks();
+            foreach ($tasks as $task) {
+                $class = '\\' . get_class($task);
+                if ($task->get_name() == 'Heatmap export data job')
+                    $lastrun = $task->get_last_run_time();
+            }
+               $sql = "select sum(numviews) as numofactviews from  
+                {block_heatmap} where courseid = :courseid";
+              $params = array('courseid' => $COURSE->id);
+                //print_r($params);
+              $totalviews = $DB->get_record_sql($sql, $params);
+
+              $sql =  "SELECT count(userid) as users
+                       FROM {user_lastaccess} where courseid = :courseid";
+
+              $params = array('courseid' => $COURSE->id);
+                //print_r($params);
+                $totalusersdistinct = $DB->get_record_sql($sql, $params);
+
+            $this->content->text .= html_writer::div(
+                get_string('totalviews', 'block_heatmap', $totalviews->numofactviews),
+                'block_heatmap_totalviews'
+            );
+            $this->content->text .= html_writer::div(
+                get_string('distinctuserviews', 'block_heatmap', $totalusers),
+                'block_heatmap_userviews'
+            );
+            $this->content->text .= html_writer::div(
+                get_string('totaldistinctusers', 'block_heatmap', $totalusersdistinct->users),
+                'block_heatmap_userviews'
+            );    
+            if ($activitysince == 'sincestart') {
+                $this->content->text .= html_writer::div(
+                    get_string('sincecoursestart', 'block_heatmap', date("d/m/y",$COURSE->startdate)),
+                    'block_heatmap_sincecoursestart'
+                );
+            }
+            $this->content->text .= html_writer::div(
+                get_string('updated', 'block_heatmap',date("d/m/y g:i a",$lastrun)
+                ),
+                'block_heatmap_updated'
+            );
+        } else {
+            $this->content->text .= html_writer::div(
+                get_string('totalviews', 'block_heatmap', $totalviews),
+                'block_heatmap_totalviews'
+            );
+            $this->content->text .= html_writer::div(
+                get_string('distinctuserviews', 'block_heatmap', $totalusers),
+                'block_heatmap_userviews'
+            );
+            if ($activitysince == 'sincestart') {
+                $this->content->text .= html_writer::div(
+                    get_string('sincecoursestart', 'block_heatmap', date("d/m/y",$COURSE->startdate)),
+                    'block_heatmap_sincecoursestart'
+                );
+            }
+            $this->content->text .= html_writer::div(
+                    get_string('updated', 'block_heatmap',
+                        userdate($updated, get_string('strftimerecentfull', 'langconfig'))
+                    ),
+                    'block_heatmap_updated'
+                );
+        }
         // Set up JS for injecting heatmap.
         $jsmodule = array(
             'name'     => 'block_heatmap',

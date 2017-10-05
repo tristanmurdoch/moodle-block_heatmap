@@ -26,6 +26,18 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
 
+   // temp table to reduce log querie duration.
+    $options = array(
+        'true' => 'Yes',
+        'false' => 'No',
+    );
+    $settings->add(new admin_setting_configselect('block_heatmap/temptable',
+        get_string('checkfortemptable', 'block_heatmap'),
+        get_string('checkfortemptable_help', 'block_heatmap'),
+        'sincestart',
+        $options)
+    );
+
     // Cache lifespan.
     $options = array(
         0 => get_string('cache0min', 'block_heatmap'),
