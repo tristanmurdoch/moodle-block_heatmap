@@ -57,6 +57,7 @@ if ($ADMIN->fulltree) {
     // Starting time of log queries.
     $options = array(
         'sincestart' => get_string('sincestart', 'block_heatmap'),
+        'sincestart-date' => get_string('sincestart-date', 'block_heatmap'),
         'sinceforever' => get_string('sinceforever', 'block_heatmap'),
     );
     $settings->add(new admin_setting_configselect('block_heatmap/activitysince',
@@ -95,8 +96,8 @@ if ($ADMIN->fulltree) {
         'false' => get_string('student_reporting_disabled', 'block_heatmap')
     );
     $settings->add(new admin_setting_configselect('block_heatmap/displaydistinctusers',
-    get_string('displaydistinctuserviews', 'block_heatmap'),
-    get_string('displaydistinctuserviews_help', 'block_heatmap'),
+    get_string('displaydistinctusers', 'block_heatmap'),
+    get_string('displaydistinctusers_help', 'block_heatmap'),
     'true',
     $options)
     );
@@ -106,8 +107,8 @@ if ($ADMIN->fulltree) {
         'false' => get_string('student_reporting_disabled', 'block_heatmap')
     );
     $settings->add(new admin_setting_configselect('block_heatmap/displaydistinctuserviews',
-    get_string('displaydistinctusers', 'block_heatmap'),
-    get_string('displaydistinctusers_help', 'block_heatmap'),
+    get_string('displaydistinctuserviews', 'block_heatmap'),
+    get_string('displaydistinctuserviews_help', 'block_heatmap'),
     'true',
     $options)
     );

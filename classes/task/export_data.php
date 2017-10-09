@@ -33,7 +33,7 @@ class export_data extends \core\task\scheduled_task {
     
     foreach($courses as $course){
         if(isset($course->id)){
-            $timesince = ($activitysince == 'sincestart') ? 'AND timecreated >= :coursestart' : '';
+            $timesince = ($activitysince == 'sincestart' or $activitysince == 'sincestart-date') ? 'AND timecreated >= :coursestart' : '';
                 $sql = "SELECT contextinstanceid as cmid, COUNT('x') AS numviews, COUNT(DISTINCT userid) AS distinctusers, '$course->id' as courseid, '0' as status
                           FROM {logstore_standard_log} l
                          WHERE courseid = :courseid
@@ -44,7 +44,6 @@ class export_data extends \core\task\scheduled_task {
                       GROUP BY contextinstanceid";
 
 	          $params = array('courseid' => $course->id, 'contextmodule' => CONTEXT_MODULE, 'coursestart' => $course->startdate );
-            //print_r($sql);
             $views = $DB->get_records_sql($sql, $params);
             //var_dump($views);
             $records[] = $views;

@@ -278,26 +278,32 @@ class block_heatmap extends block_base {
                 //print_r($params);
                 $totalusersdistinct = $DB->get_record_sql($sql, $params);
             if ($displayblockviews){
-            $this->content->text .= html_writer::div(
-                get_string('totalviews', 'block_heatmap', $totalviews->numofactviews),
-                'block_heatmap_totalviews'
-            );
+                $this->content->text .= html_writer::div(
+                    get_string('totalviews', 'block_heatmap', $totalviews->numofactviews),
+                    'block_heatmap_totalviews'
+                );
             }
             if ($displaydistinctuserviews){
-            $this->content->text .= html_writer::div(
-                get_string('distinctuserviews', 'block_heatmap', $totalusers),
-                'block_heatmap_userviews'
-            );
+                $this->content->text .= html_writer::div(
+                    get_string('distinctuserviews', 'block_heatmap', $totalusers),
+                    'block_heatmap_userviews'
+                );
             }
             if ($displaydistinctusers){
-            $this->content->text .= html_writer::div(
-                get_string('totaldistinctusers', 'block_heatmap', $totalusersdistinct->users),
-                'block_heatmap_userviews'
-            );    
+                $this->content->text .= html_writer::div(
+                    get_string('totaldistinctusers', 'block_heatmap', $totalusersdistinct->users),
+                    'block_heatmap_userviews'
+                );    
             }
             if ($activitysince == 'sincestart') {
                 $this->content->text .= html_writer::div(
-                    get_string('sincecoursestart', 'block_heatmap', date("d/m/y",$COURSE->startdate)),
+                    get_string('sincecoursestart', 'block_heatmap'),
+                    'block_heatmap_sincecoursestart'
+                    );
+            }
+            if ($activitysince == 'sincestart-date') {
+                $this->content->text .= html_writer::div(
+                    get_string('sincecoursestart-date', 'block_heatmap', date("d/m/y",$COURSE->startdate)),
                     'block_heatmap_sincecoursestart'
                 );
             }
@@ -308,20 +314,26 @@ class block_heatmap extends block_base {
             );
         } else {
 	    if ($displayblockviews){
-            $this->content->text .= html_writer::div(
-                get_string('totalviews', 'block_heatmap', $totalviews),
-                'block_heatmap_totalviews'
-            );
+                $this->content->text .= html_writer::div(
+                    get_string('totalviews', 'block_heatmap', $totalviews),
+                    'block_heatmap_totalviews'
+                );
             }
             if ($displaydistinctuserviews){
-            $this->content->text .= html_writer::div(
-                get_string('distinctuserviews', 'block_heatmap', $totalusers),
-                'block_heatmap_userviews'
-            );
+                $this->content->text .= html_writer::div(
+                    get_string('distinctuserviews', 'block_heatmap', $totalusers),
+                    'block_heatmap_userviews'
+                );
             }
             if ($activitysince == 'sincestart') {
                 $this->content->text .= html_writer::div(
-                    get_string('sincecoursestart', 'block_heatmap', date("d/m/y",$COURSE->startdate)),
+                    get_string('sincecoursestart', 'block_heatmap'),
+                    'block_heatmap_sincecoursestart'
+                    );
+            }
+            if ($activitysince == 'sincestart-date') {
+                $this->content->text .= html_writer::div(
+                    get_string('sincecoursestart-date', 'block_heatmap', date("d/m/y",$COURSE->startdate)),
                     'block_heatmap_sincecoursestart'
                 );
             }
