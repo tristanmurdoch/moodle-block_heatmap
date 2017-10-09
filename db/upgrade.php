@@ -19,7 +19,7 @@ function xmldb_block_heatmap_upgrade($oldversion) {
             $dbman->create_table($table);
         }
         // heatmap savepoint reached.
-        upgrade_block_savepoint(true, 2017100600, 'heatmap');
+        upgrade_block_savepoint(true, 2017100900, 'heatmap');
 }
 return true;
 }
