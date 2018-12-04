@@ -127,6 +127,10 @@ class block_heatmap extends block_base {
                 $displaydistinctusers = false;
 
         }
+        $usecachetable = get_config('block_heatmap', 'temptable');
+            if ($usecachetable !== 'true') {
+                $usecachetable = false;
+        }
 
         // Get cached logs to avoid hitting the logs each reload.
         $cachedlogs = cache::make('block_heatmap', 'cachedlogs');
@@ -174,11 +178,6 @@ class block_heatmap extends block_base {
             if (!$uselegacyreader && !$useinternalreader) {
                 $this->content->text = get_string('nologreaderenabled', 'block_heatmap');
                 return $this->content;
-            }
-
-            $usecachetable = get_config('block_heatmap', 'temptable');
-            if ($usecachetable !== 'true') {
-                $usecachetable = false;
             }
             
             // Get records from cached table if true
